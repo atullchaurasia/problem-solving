@@ -1,5 +1,7 @@
 import torch
 import torch.nn as nn
+import os
+import torchvision.utils as vutils
 import torch.optim as optim
 import torchvision
 import torchvision.datasets as datasets
@@ -59,10 +61,6 @@ writer_fake = SummaryWriter(f"logs/fake")
 writer_real = SummaryWriter(f"logs/real")
 step = 0
 
-import os
-import torchvision.utils as vutils
-
-# Create directory to save generated images
 os.makedirs("generated_images", exist_ok=True)
 
 for epoch in range(num_epochs):
@@ -97,7 +95,6 @@ for epoch in range(num_epochs):
                 fake = gen(fixed_noise).reshape(-1, 1, 28, 28)
                 img_grid_fake = vutils.make_grid(fake, normalize=True)
 
-                # Save generated images
                 vutils.save_image(img_grid_fake, f"generated_images/fake_epoch_{epoch}.png")
 
                 writer_fake.add_image("Mnist Fake Images", img_grid_fake, global_step=step)
