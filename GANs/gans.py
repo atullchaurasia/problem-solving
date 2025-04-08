@@ -7,7 +7,6 @@ from torch.utils.data import DataLoader
 import torchvision.transforms as transforms
 from torch.utils.tensorboard import SummaryWriter 
 
-
 class Discriminator(nn.Module):
     def __init__(self, in_features):
         super().__init__()
@@ -60,6 +59,12 @@ writer_fake = SummaryWriter(f"logs/fake")
 writer_real = SummaryWriter(f"logs/real")
 step = 0
 
+import os
+import torchvision.utils as vutils
+
+# Create directory to save generated images
+os.makedirs("generated_images", exist_ok=True)
+
 for epoch in range(num_epochs):
     for batch_idx, (real, _) in enumerate(loader):
         real = real.view(-1, 784).to(device)
@@ -90,14 +95,10 @@ for epoch in range(num_epochs):
 
             with torch.no_grad():
                 fake = gen(fixed_noise).reshape(-1, 1, 28, 28)
-                data = real.reshape(-1, 1, 28, 28)
-                img_grid_fake = torchvision.utils.make_grid(fake, normalize=True)
-                img_grid_real = torchvision.utils.make_grid(data, normalize=True)
+                img_grid_fake = vutils.make_grid(fake, normalize=True)
 
-                writer_fake.add_image(
-                    "Mnist Fake Images", img_grid_fake, global_step=step
-                )
-                writer_real.add_image(
-                    "Mnist Real Images", img_grid_real, global_step=step
-                )
+                # Save generated images
+                vutils.save_image(img_grid_fake, f"generated_images/fake_epoch_{epoch}.png")
+
+                writer_fake.add_image("Mnist Fake Images", img_grid_fake, global_step=step)
                 step += 1
